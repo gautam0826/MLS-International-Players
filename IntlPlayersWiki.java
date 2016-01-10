@@ -28,7 +28,7 @@ public class IntlPlayersWiki
     
     public static void main(String[] args) throws IOException, ParseException
     {
-        writer = new FileWriter("ForeignPlayers.csv");
+        writer = new FileWriter("IntlPlayers.csv");
         writer.write("Season,Date,Player,Club From,Club To,Transfer Mode,"
             + "Nationality,Intl Caps,Wikipedia Page Words,League From");
         for (season = 2012; season < 2016; season++)
