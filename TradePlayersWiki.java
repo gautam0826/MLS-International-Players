@@ -33,7 +33,7 @@ public class TradePlayersWiki
         writer = new FileWriter("TradePlayersAPCS.csv");
         writer.write("Season,Date,Player,Position,Club From,Club To,Transfer Mode,"
             + "Nationality,Intl Caps,Wikipedia Page Words,League From");
-        for (season = 2012; season < 2016; season++)
+        for (season = 2009; season < 2016; season++)
         {
             scrapeData(season);
         }
@@ -52,7 +52,7 @@ public class TradePlayersWiki
             {
                 clubToURL = getClubToURL(tds);
                 mode = removeBrackets(tds.get(4).text());
-                if (!getLeague(clubToURL).equals( "Major League Soccer" ) 
+                if (!getLeague(clubToURL).equals( "Major League Soccer" )
                                 || !mode.contains( "Trade" ))
                 {
                     break outerloop;
