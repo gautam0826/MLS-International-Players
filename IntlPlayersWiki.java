@@ -19,6 +19,8 @@ public class IntlPlayersWiki
     public static String clubToURL = "";
     public static String mode = "";
     public static String date = "";
+    public static String position = "";
+    public static String length = "";
     public static String nationality = "";
     public static Boolean nationalTeam = false;
     public static int numWords = 0;
@@ -28,8 +30,8 @@ public class IntlPlayersWiki
     
     public static void main(String[] args) throws IOException, ParseException
     {
-        writer = new FileWriter("IntlPlayers.csv");
-        writer.write("Season,Date,Player,Club From,Club To,Transfer Mode,"
+        writer = new FileWriter("ForeignPlayersAPCS.csv");
+        writer.write("Season,Date,Player,Position,Club From,Club To,Transfer Mode,"
             + "Nationality,Intl Caps,Wikipedia Page Words,League From");
         for (season = 2012; season < 2016; season++)
         {
@@ -65,8 +67,7 @@ public class IntlPlayersWiki
                 clubFrom = tds.get(2).text();
                 clubTo = tds.get(3).text();
                 nationality = getNation(tds);
-                if (clubFrom.contains( "Academy" ) 
-                                || getLeague(clubToURL).equals( "Major League Soccer" ))
+                if (clubFrom.contains( "Academy" ))
                 {
                     break outerloop;
                 }
@@ -74,11 +75,15 @@ public class IntlPlayersWiki
                 {
                     nationalTeam = false;
                     numWords = 0;
+                    position = "?";
+                    length = "?";
                 }
                 else
                 {
                     nationalTeam = getNatsCallUp(playerURL);
                     numWords = getNumWords(playerURL);
+                    //position = getPosition(playerURL);
+                    //length = getLength(playerURL);
                 }
                 if (clubFromURL == null)
                 {
@@ -92,6 +97,11 @@ public class IntlPlayersWiki
                 {
                     league = removeBrackets(getLeague(clubFromURL));
                 }
+                if (league.equals( "Major League Soccer" ))
+                {
+                    break outerloop;
+                }
+                //System.out.println(length);
                 writeOut();
             }
         }
@@ -115,6 +125,23 @@ public class IntlPlayersWiki
         return league;
     }
     
+//    public static String getPosition(String url) throws IOException
+//    {
+//        String position = "?";
+//        Document doc = Jsoup.connect( url ).timeout( 0 ).get();
+//        Element table = doc.select("table[class=infobox vcard]").first();
+//        for (Element row : table.select("tr")) 
+//        {
+//            Elements ths = row.select("th");
+//            if (ths.text().toLowerCase().contains( "position" ))
+//            {
+//                Elements tds = row.select("td");
+//                position = tds.text();
+//            }
+//        }
+//        return position;
+//    }
+    
     public static String getNation(Elements tds)
     {
         String nation = tds.get(1).select("a[href]").attr("abs:href");
@@ -134,6 +161,30 @@ public class IntlPlayersWiki
             }
         }
         return false;
+    }
+    
+    public static String getLength(String url) throws IOException
+    {
+        String length = "Unknown";
+        Document doc = Jsoup.connect( url ).timeout( 0 ).get();
+        Element table = doc.select("table[class=infobox vcard]").first();
+        boolean seniorCareer = false;
+        for (Element row : table.select("tr")) 
+        {
+            Elements ths = row.select("th");
+            Elements tds = row.select("td");
+            String link = tds.select("a[href]").attr("abs:href");
+            if (ths.text().toLowerCase().contains( "senior career" ))
+            {
+                seniorCareer = true;
+            }
+            if (seniorCareer && link.contains( "https://en.wikipedia.org/wiki/" ) 
+                            && getLeague(link).equals( "Major League Soccer" ))
+            {
+                length = ths.text();
+            }
+        }
+        return length;
     }
     
     public static int getNumWords(String url) throws IOException
@@ -240,6 +291,7 @@ public class IntlPlayersWiki
         String result = season + ",";
         result += date + ",";
         result += player + ",";
+        result += position + ",";
         result += clubFrom + ",";
         result += clubTo + ",";
         result += mode + ",";
